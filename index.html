@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --primary-light: #757de8;
+            --primary-dark: #002984;
+            --secondary-color: #f50057;
+            --text-color: #333;
+            --text-light: #666;
+            --bg-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --border-color: #e0e0e0;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-hover: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 25px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 32px;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            padding: 30px 0;
+        }
+
+        .page-title {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: #e0e0e0;
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #d5d5d5;
+        }
+
+        /* Table Styles */
+        .table-container {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f9f9f9;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color 0.3s;
+            font-size: 23px;
+        }
+
+        .action-btn:hover {
+            color: var(--primary-color);
+        }
+
+        /* Slide-over Modal Styles */
+        .slide-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .slide-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .slide-modal {
+            position: fixed;
+            top: 0;
+            right: -50%;
+            width: 50%;
+            height: 100%;
+            background-color: var(--card-bg);
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            transition: right 0.3s ease-in-out;
+            overflow-y: auto;
+        }
+
+        .slide-overlay.active .slide-modal {
+            right: 0;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Profile Page Styles */
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .profile-header {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 60px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .profile-avatar:hover .edit-overlay {
+            opacity: 1;
+        }
+
+        .edit-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .profile-contact {
+            color: var(--text-light);
+            margin-bottom: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .copy-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .profile-content {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        /* Tab Buttons */
+        .profile-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            background-color: #f9f9f9;
+        }
+
+        .profile-tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            color: var(--text-light);
+            background: none;
+            border: none;
+            font-size: 16px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .profile-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background-color: white;
+        }
+
+        .tab-content {
+            padding: 30px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .section-edit {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .section-edit:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Three Column Layout for Basic Details */
+        .three-column-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+        }
+
+        .form-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .field-label {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        /* Visible Field Boxes - Read Only */
+        .field-box {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: #f9f9f9;
+            color: var(--text-color);
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+        }
+
+        .field-box.textarea {
+            min-height: 100px;
+            align-items: flex-start;
+            white-space: pre-wrap;
+        }
+
+        .field-placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        .select-placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Two Column Layout for other sections */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .field-group {
+            margin-bottom: 15px;
+        }
+
+        .field-label {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .field-box field-placeholder {
+            font-size: 16px;
+        }
+
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .skill-tag {
+            background-color: #e3f2fd;
+            color: var(--primary-color);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .experience-item {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .experience-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #333;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1002;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1200px) {
+            .three-column-layout {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .slide-modal {
+                width: 70%;
+                right: -70%;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .three-column-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .slide-modal {
+                width: 85%;
+                right: -85%;
+            }
+            
+            .profile-tabs {
+                flex-direction: column;
+            }
+            
+            .profile-tab {
+                border-bottom: 1px solid var(--border-color);
+                border-left: 4px solid transparent;
+            }
+            
+            .profile-tab.active {
+                border-bottom-color: transparent;
+                border-left-color: var(--primary-color);
+            }
+            
+            th:nth-child(3), td:nth-child(3) {
+                display: none;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .slide-modal {
+                width: 100%;
+                right: -100%;
+            }
+            
+            th:nth-child(2), td:nth-child(2) {
+                display: none;
+            }
+        }
+
+        /* Loading and Error States */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-message {
+            background-color: #ffebee;
+            color: var(--error-color);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message {
+            background-color: #e8f5e9;
+            color: var(--success-color);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        /* Page Navigation */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Inline fields for Year of Birth and Gender */
+        .inline-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* LinkedIn and Resume sections side by side */
+        .linkedin-resume-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        /* Tab notification badge */
+        .tab-badge {
+            position: absolute;
+            top: 1px;
+            right: 1px;
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">LOGO</div>
+                <div class="header-icons">
+                    <button class="icon-btn">
+                        <i class="fas fa-headset"></i>
+                    </button>
+                    <button class="icon-btn">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button class="icon-btn" id="profileIcon">
+                        <i class="fas fa-user-circle"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container main-content">
+        <!-- Users Page -->
+        <div id="usersPage" class="page active">
+            <div class="page-title">
+                <h1>Users</h1>
+                <button class="btn btn-primary" id="addUserBtn">
+                    <i class="fas fa-plus"></i> Add User
+                </button>
+            </div>
+            
+            <div class="error-message" id="usersError"></div>
+            <div class="success-message" id="usersSuccess"></div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>User Name</th>
+                            <th>Email</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Users will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div id="profilePage" class="page">
+            <div class="profile-container">
+                <!-- Profile Header -->
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profileAvatar">
+                        <i class="fas fa-user"></i>
+                        <div class="edit-overlay">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                    </div>
+                    <div class="profile-info">
+                        <h2 class="profile-name" id="profileName">Dave Richards</h2>
+                        <p class="profile-contact" id="profileEmail">
+                            dave@mail.com
+                            <button class="copy-btn" id="copyEmailBtn">
+                                <i class="far fa-copy"></i>
+                            </button>
+                        </p>
+                        <p class="profile-contact" id="profilePhone">+91 8332883854</p>
+                    </div>
+                </div>
+                
+                <!-- Profile Content with Tabs -->
+                <div class="profile-content">
+                    <div class="profile-tabs">
+                        <button class="profile-tab active" data-tab="basicInfo">Basic Info</button>
+                        <button class="profile-tab" data-tab="educationSkills">
+                            Education & Skills
+                            <span class="tab-badge"></span>
+                        </button>
+                        <button class="profile-tab" data-tab="experience">Experience</button>
+                    </div>
+                    
+                    <div class="tab-content">
+                        <!-- Basic Info Tab -->
+                        <div class="tab-pane active" id="basicInfoTab">
+                            <div class="section">
+                                <div class="section-header">
+                                    <h3 class="section-title">Basic Details</h3>
+                                    <button class="section-edit" data-section="basicInfo">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </button>
+                                </div>
+                                <div class="three-column-layout">
+                                    <div class="form-column">
+                                        <div class="field-group">
+                                            <div class="field-label">First name</div>
+                                            <div class="field-box field-placeholder">e.g. John</div>
+                                        </div>
+                                        <!-- Year of birth and Gender on same line -->
+                                        <div class="inline-fields">
+                                            <div class="field-group">
+                                                <div class="field-label">Year of birth</div>
+                                                <div class="field-box field-placeholder">YYYY</div>
+                                                
+                                            </div>
+                                            <div class="field-group">
+                                                <div class="field-label">Gender</div>
+                                                <div class="field-box select-placeholder">Select an option</div>
+                                            </div>
+                                        </div>
+                                        <div class="field-group">
+                                            <div class="field-label">Address</div>
+                                            <div class="field-box textarea field-placeholder">Enter here</div>
+                                        </div>
+                                    </div>
+                                    <div class="form-column">
+                                        <div class="field-group">
+                                            <div class="field-label">Last name</div>
+                                            <div class="field-box field-placeholder">e.g. Doe</div>
+                                        </div>
+                                        <div class="field-group">
+                                            <div class="field-label">Phone number</div>
+                                            <div class="field-box">8332883854</div>
+                                        </div>
+                                        <div class="field-group">
+                                            <div class="field-label">Pincode</div>
+                                            <div class="field-box field-placeholder">Enter here</div>
+                                        </div>
+                                        <div class="field-group">
+                                            <div class="field-label">Domicile country</div>
+                                            <div class="field-box select-placeholder">Select an option</div>
+                                        </div>
+                                    </div>
+                                    <div class="form-column">
+                                        <div class="field-group">
+                                            <div class="field-label">Email ID</div>
+                                            <div class="field-box field-placeholder">e.g. mmobody@mail.com</div>
+                                        </div>
+                                        <div class="field-group">
+                                            <div class="field-label">Alternate Phone no</div>
+                                            <div class="field-box field-placeholder">e.g. 9876543210</div>
+                                        </div>
+                                        <div class="field-group">
+                                            <div class="field-label">Domicile state</div>
+                                            <div class="field-box select-placeholder">Select an option</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Education & Skills Tab -->
+                        <div class="tab-pane" id="educationSkillsTab">
+                            <div class="section">
+                                <div class="section-header">
+                                    <h3 class="section-title">Education Details</h3>
+                                    <button class="section-edit" data-section="education">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </button>
+                                </div>
+                                <div class="info-grid">
+                                    <div class="field-group">
+                                        <div class="field-label">School / College</div>
+                                        <div class="field-box field-placeholder">Lincoln College</div>
+                                    </div>
+                                    <div class="field-group">
+                                        <div class="field-label">Course</div>
+                                        <div class="field-box field-placeholder">Computer Science Engineering</div>
+                                    </div>
+                                    <div class="field-group">
+                                        <div class="field-label">Highest degree or equivalent</div>
+                                        <div class="field-box field-placeholder">Bachelors in Technology</div>
+                                    </div>
+                                    <div class="info-grid">
+                                        <div class="field-group">
+                                            <div class="field-label">Year of completion</div>
+                                            <div class="field-box field-placeholder">2012</div>
+                                        </div>
+                                        <div class="field-group">
+                                            <div class="field-label">Grade</div>
+                                            <div class="field-box field-placeholder">8.5 CGPA</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="section">
+                                <div class="section-header">
+                                    <h3 class="section-title">Skills & Projects</h3>
+                                    <button class="section-edit" data-section="skills">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </button>
+                                </div>
+                                <div class="info-grid">
+                                    <div class="field-group">
+                                        <div class="field-label">Skills</div>
+                                        <div class="field-box textarea field-placeholder">Enter Here</div>
+                                    </div>
+                                    <div class="field-group">
+                                        <div class="field-label">Projects</div>
+                                        <div class="field-box textarea field-placeholder">Enter Here</div>
+                                    </div>
+                                </div>
+                            </div>   
+                        </div>
+                        
+                        <!-- Experience Tab -->
+                        <div class="tab-pane" id="experienceTab">
+                            <div class="section">
+                                <div class="section-header">
+                                    <h3 class="section-title">Work Experience</h3>
+                                    <button class="section-edit" data-section="experience">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="experience-item">
+                                        <div class="field-group">
+                                            <div class="field-label">Domain</div>
+                                            <div class="field-box field-placeholder">Technology</div>
+                                        </div>
+                                        <div class="info-grid">
+                                        <div class="field-group">
+                                            <div class="field-label">Sub-domain</div>
+                                            <div class="field-box field-placeholder">MERN Stack</div>
+                                        </div>
+                                        <div class="field-group">
+                                            <div class="field-label">Experience</div>
+                                            <div class="field-box field-placeholder">3 years</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="experience-item">
+                                        <div class="field-group">
+                                            <div class="field-label">Domain</div>
+                                            <div class="field-box field-placeholder">Technology</div>
+                                        </div>
+                                        <div class="info-grid">
+                                        <div class="field-group">
+                                            <div class="field-label">Sub-domain</div>
+                                            <div class="field-box field-placeholder">Frontend Development</div>
+                                        </div>
+                                        <div class="field-group">
+                                            <div class="field-label">Experience</div>
+                                            <div class="field-box field-placeholder">2 years</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- LinkedIn and Resume sections side by side -->
+                            <div class="linkedin-resume-container">
+                                <div class="section">
+                                    <div class="section-header">
+                                        <h3 class="section-title">LinkedIn</h3>
+                                        <button class="section-edit" data-section="linkedin">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </button>
+                                    </div>
+                                    <div class="field-group">
+                                        <div class="field-label">Profile URL</div>
+                                        <div class="field-box field-placeholder">linkedin.com/in/dave-richards</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="section">
+                                    <div class="section-header">
+                                        <h3 class="section-title">Resume</h3>
+                                        <button class="section-edit" data-section="resume">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </button>
+                                    </div>
+                                    <div class="field-group">
+                                        <div class="field-box field-placeholder">
+                                            <a href="#" class="btn btn-secondary">myresume.pdf</a>
+                                            <span style="margin-left: 10px;">View</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Slide-over Modal -->
+    <div class="slide-overlay" id="addUserModal">
+        <div class="slide-modal">
+            <div class="modal-header">
+                <h2>Add User</h2>
+                <button class="close-btn" id="closeAddUserModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="userName">Name of the user</label>
+                    <input type="text" id="userName" class="form-control" placeholder="Type here">
+                </div>
+                <div class="form-group">
+                    <label for="userEmail">E-mail</label>
+                    <input type="email" id="userEmail" class="form-control" placeholder="Type here">
+                </div>
+                <div class="form-group">
+                    <label for="userContact">Contact</label>
+                    <input type="text" id="userContact" class="form-control" placeholder="Type here">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelAddUser">Cancel</button>
+                <button class="btn btn-primary" id="saveUser">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Sample data for users
+        let users = [
+            { id: 1, name: "Dave Richards", email: "dave@mail.com", contact: "+91 8332883854" },
+            { id: 2, name: "Abhishek Hari", email: "hari@mail.com", contact: "+91 9876543210" },
+            { id: 3, name: "Nishta Gupta", email: "nishta@mail.com", contact: "+91 9123456789" }
+        ];
+
+        // DOM Elements
+        const usersPage = document.getElementById('usersPage');
+        const profilePage = document.getElementById('profilePage');
+        const profileIcon = document.getElementById('profileIcon');
+        const addUserBtn = document.getElementById('addUserBtn');
+        const usersTableBody = document.getElementById('usersTableBody');
+        const addUserModal = document.getElementById('addUserModal');
+        const closeAddUserModal = document.getElementById('closeAddUserModal');
+        const cancelAddUser = document.getElementById('cancelAddUser');
+        const saveUser = document.getElementById('saveUser');
+        const userNameInput = document.getElementById('userName');
+        const userEmailInput = document.getElementById('userEmail');
+        const userContactInput = document.getElementById('userContact');
+        const profileTabs = document.querySelectorAll('.profile-tab');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+        const profileName = document.getElementById('profileName');
+        const profileEmail = document.getElementById('profileEmail');
+        const profilePhone = document.getElementById('profilePhone');
+        const usersError = document.getElementById('usersError');
+        const usersSuccess = document.getElementById('usersSuccess');
+        const toast = document.getElementById('toast');
+        const copyEmailBtn = document.getElementById('copyEmailBtn');
+        const profileAvatar = document.getElementById('profileAvatar');
+
+        // Load users from localStorage if available
+        function loadUsers() {
+            const storedUsers = localStorage.getItem('users');
+            if (storedUsers) {
+                users = JSON.parse(storedUsers);
+            }
+            renderUsers();
+        }
+
+        // Save users to localStorage
+        function saveUsers() {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        // Render users in the table
+        function renderUsers() {
+            usersTableBody.innerHTML = '';
+            
+            if (users.length === 0) {
+                usersTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No users found</td></tr>';
+                return;
+            }
+            
+            users.forEach((user, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td class="action-buttons">
+                        <button class="action-btn view-user" data-id="${user.id}">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn delete-user" data-id="${user.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                usersTableBody.appendChild(row);
+            });
+            
+            // Add event listeners for view and delete buttons
+            document.querySelectorAll('.view-user').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const userId = parseInt(e.currentTarget.getAttribute('data-id'));
+                    viewUser(userId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-user').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const userId = parseInt(e.currentTarget.getAttribute('data-id'));
+                    deleteUser(userId);
+                });
+            });
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Show error message
+        function showError(message, element) {
+            element.textContent = message;
+            element.style.display = 'block';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        // Show success message
+        function showSuccess(message, element) {
+            element.textContent = message;
+            element.style.display = 'block';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        // Add new user
+        function addNewUser() {
+            const name = userNameInput.value.trim();
+            const email = userEmailInput.value.trim();
+            const contact = userContactInput.value.trim();
+            
+            if (!name || !email || !contact) {
+                showError('Please fill in all fields', usersError);
+                return;
+            }
+            
+            // Simple email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showError('Please enter a valid email address', usersError);
+                return;
+            }
+            
+            // Check if email already exists
+            if (users.some(user => user.email === email)) {
+                showError('A user with this email already exists', usersError);
+                return;
+            }
+            
+            const newUser = {
+                id: users.length > 0 ? Math.max(...users.map(user => user.id)) + 1 : 1,
+                name,
+                email,
+                contact
+            };
+            
+            users.push(newUser);
+            saveUsers();
+            renderUsers();
+            closeAddUserModalFunc();
+            showSuccess('User added successfully', usersSuccess);
+            
+            // Clear form
+            userNameInput.value = '';
+            userEmailInput.value = '';
+            userContactInput.value = '';
+        }
+
+        // View user
+        function viewUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (user) {
+                // Set profile data
+                profileName.textContent = user.name;
+                profileEmail.textContent = user.email;
+                profilePhone.textContent = user.contact;
+                
+                // Switch to profile page
+                switchToProfilePage();
+            }
+        }
+
+        // Delete user
+        function deleteUser(userId) {
+            // Check if this is the last user
+            if (users.length <= 1) {
+                showToast("You cannot delete the last user record");
+                return;
+            }
+            
+            if (confirm('Are you sure you want to delete this user?')) {
+                users = users.filter(user => user.id !== userId);
+                saveUsers();
+                renderUsers();
+                showSuccess('User deleted successfully', usersSuccess);
+            }
+        }
+
+        // Copy email to clipboard
+        function copyEmail() {
+            const email = profileEmail.textContent.trim();
+            navigator.clipboard.writeText(email).then(() => {
+                showToast("Email copied to clipboard");
+            }).catch(err => {
+                console.error('Failed to copy email: ', err);
+                showToast("Failed to copy email");
+            });
+        }
+
+        // Close add user modal
+        function closeAddUserModalFunc() {
+            addUserModal.classList.remove('active');
+        }
+
+        // Open add user modal
+        function openAddUserModal() {
+            addUserModal.classList.add('active');
+        }
+
+        // Switch to profile page
+        function switchToProfilePage() {
+            usersPage.classList.remove('active');
+            profilePage.classList.add('active');
+        }
+
+        // Switch to users page
+        function switchToUsersPage() {
+            profilePage.classList.remove('active');
+            usersPage.classList.add('active');
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUsers();
+        });
+
+        profileIcon.addEventListener('click', switchToProfilePage);
+        
+        // For demo purposes, add a way to go back to users page
+        document.querySelector('.logo').addEventListener('click', switchToUsersPage);
+
+        addUserBtn.addEventListener('click', openAddUserModal);
+        closeAddUserModal.addEventListener('click', closeAddUserModalFunc);
+        cancelAddUser.addEventListener('click', closeAddUserModalFunc);
+        saveUser.addEventListener('click', addNewUser);
+
+        // Profile tab switching
+        profileTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                // Update active tab
+                profileTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Show corresponding tab content
+                tabPanes.forEach(pane => {
+                    pane.classList.remove('active');
+                    if (pane.id === `${tabId}Tab`) {
+                        pane.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // Copy email functionality
+        copyEmailBtn.addEventListener('click', copyEmail);
+
+        // Profile avatar edit functionality
+        profileAvatar.addEventListener('click', () => {
+            showToast("Profile picture edit feature would open here");
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === addUserModal) {
+                closeAddUserModalFunc();
+            }
+        });
+    </script>
+</body>
+</html>
